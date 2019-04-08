@@ -25,7 +25,6 @@ class Aliyun {
       region: config.region,
       secure: config.secure,
     }, config))
-    
     this._bucket = new Resetable(config.bucket)
   }
 
@@ -40,7 +39,6 @@ class Aliyun {
    */
   bucket (bucket) {
     this._bucket.set(bucket)
-    
     return this
   }
 
@@ -55,20 +53,9 @@ class Aliyun {
    *
    * @return {Promise<Boolean>}
    */
-  exists (location, params) {
-    return new Promise((resolve, reject) => {
-      const successStatuses = [200, 304]
-
-      this.oss.head(location, params)
-        .then((response) => {
-          if (successStatuses.indexOf(response.status) >= 0) {
-            resolve(true)
-          } else {
-            reject(response)
-          }
-        })
-        .catch(error => reject(error))
-    })
+  async exists (location, params) {
+    await this.oss.head(location, params)
+    return true
   }
 
   /**
@@ -83,18 +70,9 @@ class Aliyun {
    *
    * @return {Promise<String>}
    */
-  put (location, content, params) {
-    return new Promise((resolve, reject) => {
-      this.oss.put(location, content, params)
-       .then((response) => {
-         if (response.status === 200) {
-          resolve(response.name)
-         } else {
-           reject(response)
-         }
-       })
-       .catch(error => reject(error))
-    })
+  async put (location, content, params) {
+    const response = await this.oss.put(location, content, params)
+    return response
   }
 
   /**
@@ -108,12 +86,9 @@ class Aliyun {
    *
    * @return {Promise<Boolean>}
    */
-  delete (location, params = {}) {
-    return new Promise((resolve, reject) => {
-      this.oss.delete(location, params)
-      .then(() => resolve(true))
-      .catch(error => reject(error))
-    })
+  async delete (location, params = {}) {
+    await this.oss.delete(location, params)
+    return true
   }
 
   /**
@@ -125,17 +100,15 @@ class Aliyun {
    * @param  {String} [file]
    * @param  {Object} [params = {}]
    *
-   * @return {Promise<String>}
+   * @return {Promise<Buffer>}
    */
-  get (location, file = '', params = {}) {
-    return new Promise((resolve, reject) => {
-      this.oss.get(location)
-      .then(response => {
-        const content = response.content
-        return Buffer.isBuffer(content) ? resolve(content) : reject(content)
-      })
-      .catch(error => reject(error))
-    })
+  async get (location, file = '', params = {}) {
+    const response = await this.oss.get(location)
+    const content = response.content
+    if (Buffer.isBuffer(content)) {
+      return content
+    }
+    throw Error(content)
   }
 
   /**
@@ -146,16 +119,27 @@ class Aliyun {
    * @param  {String}  location
    * @param  {Object}  [params = {}]
    *
-   * @return {Stream}
+   * @return {Promise<Stream>}
    */
-  getStream (location, params = {}) {
-    return new Promise((resolve, reject) => {
-      this.oss.getStream(location, params)
-      .then(response => {
-        resolve(response.stream)
-      })
-      .catch(error => reject(error))
-    })
+  async getStream (location, params = {}) {
+    const { stream } = await this.oss.getStream(location, params)
+    return stream
+  }
+
+  /**
+   * Puts a stream
+   *
+   * @method putStream
+   *
+   * @param  {String}  location
+   * @param  {Stream}  file
+   * @param  {Object}  [params = {}]
+   *
+   * @return {Promise<String>}
+   */
+  async putStream (location, file, params = {}) {
+    const response = await this.oss.putStream(location, file, params)
+    return response
   }
 
   /**
@@ -190,17 +174,12 @@ class Aliyun {
    *
    * @return {Promise<String>}
    */
-  copy (src, dest, destBucket, params = {}) {
-    return new Promise((resolve, reject) => {
-      const bucket = this._bucket.pull()
-      const combinedDest = `/${bucket}/${src}`
-      // Aliyun OSS switches the src and destination for some reason
-      this.oss.copy(dest, combinedDest)
-        .then(response => {
-          resolve(this.getUrl(dest, destBucket))
-        })
-        .catch(error => reject(error))
-    })
+  async copy (src, dest, destBucket, params = {}) {
+    // Aliyun OSS switches the src and destination for some reason
+    const bucket = this._bucket.pull()
+    const combinedDest = `/${bucket}/${src}`
+    await this.oss.copy(dest, combinedDest)
+    return this.getUrl(dest, destBucket)
   }
 
   /**
