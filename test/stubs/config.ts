@@ -52,5 +52,14 @@ export default {
 			keyFilename: 'GCS_KEY',
 			bucket: 'GCS_BUCKET',
 		},
+
+		oss: {
+      driver: 'oss',
+      key: 'OSS_KEY',
+      secret: 'OSS_SECRET',
+			bucket: 'OSS_BUCKET',
+			endpoint: 'OSS_ENDPOINT',
+			region: 'OSS_REGION',
+    },
 	},
 };

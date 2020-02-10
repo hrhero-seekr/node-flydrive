@@ -22,7 +22,7 @@ export default abstract class Storage {
 	/**
 	 * Use a different bucket at runtime.
 	 *
-	 * Supported drivers: "s3", "gcs"
+	 * Supported drivers: "s3", "gcs", "oss"
 	 */
 	bucket(name: string): void {
 		throw new MethodNotSupported('bucket', this.constructor.name);
@@ -31,7 +31,7 @@ export default abstract class Storage {
 	/**
 	 * Copy a file to a location.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "oss"
 	 */
 	copy(src: string, dest: string, options: object): Promise<Response> {
 		throw new MethodNotSupported('copy', this.constructor.name);
@@ -41,7 +41,7 @@ export default abstract class Storage {
 	 * Delete existing file.
 	 * This method will not throw an exception if file doesn't exists.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "oss"
 	 */
 	delete(location: string): Promise<Response> {
 		throw new MethodNotSupported('delete', this.constructor.name);
@@ -50,7 +50,7 @@ export default abstract class Storage {
 	/**
 	 * Returns the driver.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "oss"
 	 */
 	public driver(): unknown {
 		throw new MethodNotSupported('driver', this.constructor.name);
@@ -59,7 +59,7 @@ export default abstract class Storage {
 	/**
 	 * Determines if a file or folder already exists.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "oss"
 	 */
 	exists(location: string): Promise<ExistsResponse> {
 		throw new MethodNotSupported('exists', this.constructor.name);
@@ -68,7 +68,7 @@ export default abstract class Storage {
 	/**
 	 * Returns the file contents as a string.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "oss"
 	 */
 	get(location: string, encoding?: string): Promise<ContentResponse<string>> {
 		throw new MethodNotSupported('get', this.constructor.name);
@@ -77,7 +77,7 @@ export default abstract class Storage {
 	/**
 	 * Returns the file contents as a Buffer.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "oss"
 	 */
 	getBuffer(location: string): Promise<ContentResponse<Buffer>> {
 		throw new MethodNotSupported('getBuffer', this.constructor.name);
@@ -86,7 +86,7 @@ export default abstract class Storage {
 	/**
 	 * Returns signed url for an existing file.
 	 *
-	 * Supported drivers: "s3", "gcs"
+	 * Supported drivers: "s3", "gcs", "oss"
 	 */
 	getSignedUrl(location: string, options?: SignedUrlOptions): Promise<SignedUrlResponse> {
 		throw new MethodNotSupported('getSignedUrl', this.constructor.name);
@@ -95,7 +95,7 @@ export default abstract class Storage {
 	/**
 	 * Returns file's size and modification date.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "oss"
 	 */
 	getStat(location: string): Promise<StatResponse> {
 		throw new MethodNotSupported('getStat', this.constructor.name);
@@ -104,9 +104,9 @@ export default abstract class Storage {
 	/**
 	 * Returns the stream for the given file.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "oss"
 	 */
-	getStream(location: string): Readable {
+	getStream(location: string): Readable | Promise<Readable> {
 		throw new MethodNotSupported('getStream', this.constructor.name);
 	}
 
@@ -115,7 +115,7 @@ export default abstract class Storage {
 	 * validates the existence of file or it's visibility
 	 * status.
 	 *
-	 * Supported drivers: "s3", "gcs"
+	 * Supported drivers: "s3", "gcs", "oss"
 	 */
 	getUrl(location: string): string {
 		throw new MethodNotSupported('getUrl', this.constructor.name);
@@ -124,7 +124,7 @@ export default abstract class Storage {
 	/**
 	 * Move file to a new location.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "oss"
 	 */
 	move(src: string, dest: string): Promise<Response> {
 		throw new MethodNotSupported('move', this.constructor.name);
@@ -134,7 +134,7 @@ export default abstract class Storage {
 	 * Creates a new file.
 	 * This method will create missing directories on the fly.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "oss"
 	 */
 	put(location: string, content: Buffer | Readable | string): Promise<Response> {
 		throw new MethodNotSupported('put', this.constructor.name);
