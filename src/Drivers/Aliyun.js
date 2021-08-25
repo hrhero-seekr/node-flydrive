@@ -39,6 +39,7 @@ class Aliyun {
    */
   bucket (bucket) {
     this._bucket.set(bucket)
+    this.oss.options.bucket = bucket;
     return this
   }
 
